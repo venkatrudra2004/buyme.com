@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuyMe.com | Wish it. Share it. Receive it.</title>
+    
+    <!-- Google Fonts: Nunito (Friendly Rounded Headings) & Inter (Clean Legible Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#FF4F72',
+                            primaryHover: '#E03E5F',
+                            secondary: '#FFFFFF',
+                            accent: '#FFD166',
+                            accentHover: '#E6BC50',
+                            dark: '#1A1A2E',
+                            darkCard: '#24243E',
+                            gray: '#4E4F64',
+                            lightGray: '#F7F8FA',
+                            success: '#06D6A0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Nunito', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(255, 79, 114, 0.25)',
+                        'glow-gold': '0 0 20px rgba(255, 209, 102, 0.3)',
+                        'premium': '0 10px 30px -5px rgba(26, 26, 46, 0.08)',
+                        'card-hover': '0 20px 40px -10px rgba(255, 79, 114, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Premium Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F7F8FA;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF4F72;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E03E5F;
+        }
+
+        /* Floating Animation for Hero Decorators */
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(8deg); }
+        }
+        @keyframes float-medium {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(-12deg); }
+        }
+        .animate-float-1 {
+            animation: float-slow 6s ease-in-out infinite;
+        }
+        .animate-float-2 {
+            animation: float-medium 5s ease-in-out infinite 1s;
+        }
+
+        /* Reveal on Scroll Transitions */
+        .reveal {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Toggle switch visual animation styling */
+        .toggle-dot {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        input:checked ~ .toggle-dot {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-[#FCFCFD] text-brand-dark font-sans overflow-x-hidden antialiased">
+
+<!-- Toast Notification System -->
+<div id="toast" class="fixed bottom-24 right-6 sm:bottom-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-brand-dark text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center space-x-3 border-l-4 border-brand-primary">
+        <i class="fas fa-gift text-brand-primary text-xl" id="toast-icon"></i>
+        <div>
+            <p class="font-display font-extrabold text-sm" id="toast-title">Wishlist Updated!</p>
+            <p class="text-xs text-stone-300" id="toast-message">Item successfully added to your gift registry.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Sticky Sticky CTA (Conversion Requirement) -->
+<div id="sticky-mobile-bar" class="fixed bottom-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md border-t border-stone-100 py-3.5 px-5 shadow-2xl flex items-center justify-between md:hidden transition-transform duration-300">
+    <div>
+        <p class="text-[10px] font-extrabold text-brand-primary uppercase tracking-widest font-display">Start Gifting</p>
+        <p class="text-xs font-bold text-brand-dark">Claim $10 free credits</p>
+    </div>
+    <button onclick="openWishlistModal()" class="bg-brand-primary hover:bg-brand-primaryHover text-white text-xs font-black px-5 py-3 rounded-full shadow-glow transition-all duration-200 active:scale-95">
+        <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Create My Wishlist
+    </button>
+</div>
+
+<!-- Sticky Header / Navigation -->
+<header id="main-header" class="fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-transparent py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center space-x-2 group">
+                <span class="inline-flex items-center justify-center bg-brand-primary text-white p-2.5 rounded-2xl shadow-glow group-hover:scale-105 transition-transform duration-200">
+                    <i class="fa-solid fa-gift text-xl"></i>
+                </span>
+                <span class="font-display font-black text-2xl tracking-tight text-brand-dark transition-colors duration-200">
+                    BuyMe<span class="text-brand-primary">.com</span>
+                </span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8 font-medium text-brand-gray">
+                <a href="#how-it-works" class="hover:text-brand-primary transition-colors duration-200">How It Works</a>
+                <a href="#categories" class="hover:text-brand-primary transition-colors duration-200">Browse Gifts</a>
+                <a href="#trending" class="hover:text-brand-primary transition-colors duration-200">Trending Lists</a>
+                <a href="#pricing" class="hover:text-brand-primary transition-colors duration-200">Pricing</a>
+                <a href="#gift-finder" class="hover:text-brand-primary transition-colors duration-200">Gift Finder</a>
+            </div>
+
+            <!-- Desktop Action CTA -->
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="showCustomNotification('Welcome!', 'Sign in panel is simulated for demonstration.', 'fa-circle-info')" class="text-sm font-bold text-brand-gray hover:text-brand-primary transition-colors duration-200">
+                    Sign In
+                </button>
+                <button onclick="openWishlistModal()" class="bg-brand-primary hover:bg-brand-primaryHover text-white px-6 py-3 rounded-full font-black text-sm tracking-wide transition-all duration-300 shadow-glow hover:shadow-card-hover transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-brand-primary/20">
+                    Create My Wishlist
+                </button>
+            </div>
+
+            <!-- Mobile Drawer Buttons -->
+            <div class="flex items-center md:hidden">
+                <button id="mobile-menu-btn" class="text-brand-dark hover:text-brand-primary focus:outline-none p-2" aria-label="Toggle Mobile Menu">
+                    <i class="fa-solid fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-y-0 right-0 w-4/5 max-w-sm bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6">
+        <div>
+            <div class="flex items-center justify-between mb-8">
+                <span class="font-display font-black text-2xl tracking-tight">BuyMe<span class="text-brand-primary">.com</span></span>
+                <button id="mobile-close-btn" class="text-brand-dark hover:text-brand-primary p-2">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+            <div class="flex flex-col space-y-6 text-base font-bold text-brand-gray">
+                <a href="#how-it-works" onclick="toggleMobileMenu()" class="hover:text-brand-primary transition-colors">How It Works</a>
+                <a href="#categories" onclick="toggleMobileMenu()" class="hover:text-brand-primary transition-colors">Browse Gifts</a>
+                <a href="#trending" onclick="toggleMobileMenu()" class="hover:text-brand-primary transition-colors">Trending Lists</a>
+                <a href="#pricing" onclick="toggleMobileMenu()" class="hover:text-brand-primary transition-colors">Pricing</a>
+                <a href="#gift-finder" onclick="toggleMobileMenu()" class="hover:text-brand-primary transition-colors">Gift Finder</a>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <button onclick="showCustomNotification('Feature Demo', 'Portal logins simulated.', 'fa-user'); toggleMobileMenu();" class="w-full text-center border-2 border-brand-dark text-brand-dark font-bold py-3.5 rounded-2xl hover:bg-stone-50 transition duration-200">
+                Log In
+            </button>
+            <button onclick="openWishlistModal(); toggleMobileMenu();" class="w-full text-center bg-brand-primary text-white font-black py-3.5 rounded-2xl hover:bg-brand-primaryHover transition duration-200 shadow-glow">
+                Create My Wishlist
+            </button>
+        </div>
+    </div>
+    <!-- Mobile Overlay Backdrop -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-brand-dark opacity-0 pointer-events-none transition-opacity duration-300 z-40"></div>
+</header>
+
+<!-- SECTION 1: HERO -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-[#FFF0F2] via-white to-[#F7F8FA] pt-28 pb-16 overflow-hidden">
+    <!-- Floating Decorative Elements -->
+    <div class="absolute top-28 left-[10%] text-5xl sm:text-6xl animate-float-1 select-none pointer-events-none filter drop-shadow-md">🎁</div>
+    <div class="absolute bottom-28 right-[12%] text-5xl sm:text-6xl animate-float-2 select-none pointer-events-none filter drop-shadow-md">✨</div>
+    <div class="absolute top-[40%] right-[8%] text-4xl sm:text-5xl animate-float-1 select-none pointer-events-none filter drop-shadow-md">🎈</div>
+    <div class="absolute bottom-[40%] left-[6%] text-4xl sm:text-5xl animate-float-2 select-none pointer-events-none filter drop-shadow-md">💝</div>
+
+    <!-- Soft background glowing blur elements -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-brand-primary/10 blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-brand-accent/20 blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+        <div class="text-center max-w-4xl mx-auto space-y-8">
+            <!-- High-converting microbadge -->
+            <div class="inline-flex items-center space-x-2 bg-brand-primary/10 border border-brand-primary/20 rounded-full py-1.5 px-4 text-brand-primary text-xs sm:text-sm font-extrabold tracking-wide">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
+                </span>
+                <span>The Web's Favorite Social Gifting Platform</span>
+            </div>
+
+            <!-- Bold Animated Title -->
+            <h1 class="font-display font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-brand-dark leading-[1.1] tracking-tight">
+                Give the Gift They<br>
+                <span class="text-brand-primary relative inline-block">
+                    Actually Want
+                    <span class="absolute left-0 bottom-2 w-full h-3 bg-brand-accent/40 -z-10 rounded-full"></span>
+                </span>
+            </h1>
+
+            <p class="text-brand-gray text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+                Create your wishlist in seconds. Add products from Amazon, Etsy, Apple, or anywhere. Share with friends and family. Get exactly what you love.
+            </p>
+
+            <!-- Conversion Action CTAs -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+                <button onclick="openWishlistModal()" class="w-full sm:w-auto bg-brand-primary hover:bg-brand-primaryHover text-white text-lg font-black px-8 py-4.5 rounded-full transition-all duration-300 shadow-glow hover:shadow-card-hover transform hover:-translate-y-1 active:scale-95">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Create My Wishlist
+                </button>
+                <a href="#categories" class="w-full sm:w-auto text-center bg-white border-2 border-stone-200 hover:border-brand-primary hover:text-brand-primary text-brand-dark text-lg font-black px-8 py-4.5 rounded-full transition-all duration-300 transform hover:-translate-y-1 shadow-premium">
+                    Browse Gifts <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Social Proof Trust Badge Row -->
+            <div class="pt-10 border-t border-stone-100 max-w-4xl mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">🎁</span>
+                        <span class="font-display font-extrabold text-brand-dark">2M+ Wishlists</span>
+                        <span class="text-xs text-brand-gray font-medium">Created globally</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">⭐</span>
+                        <span class="font-display font-extrabold text-brand-dark">4.9 Star Rating</span>
+                        <span class="text-xs text-brand-gray font-medium">From 40,000+ reviews</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">🔒</span>
+                        <span class="font-display font-extrabold text-brand-dark">Secure Checkout</span>
+                        <span class="text-xs text-brand-gray font-medium">Bank-level encryption</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-2xl mb-1">🚀</span>
+                        <span class="font-display font-extrabold text-brand-dark">Free to Use</span>
+                        <span class="text-xs text-brand-gray font-medium">No hidden fees</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Down Arrow Indicator -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 hidden md:flex flex-col items-center space-y-1 opacity-70 hover:opacity-100 transition-opacity">
+            <span class="text-xxs font-black uppercase tracking-widest text-brand-gray">Explore BuyMe</span>
+            <a href="#how-it-works" class="animate-bounce bg-white shadow-premium p-2.5 rounded-full border border-stone-100 text-brand-primary">
+                <i class="fa-solid fa-arrow-down"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 2: HOW IT WORKS -->
+<section id="how-it-works" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-20 reveal">
+            <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Simple & Magical</span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark leading-tight">Gifting in 3 Easy Steps</h2>
+            <p class="text-brand-gray text-base sm:text-lg">
+                BuyMe brings family, friends, and the perfect gift closer than ever before. Let's look at how it works.
+            </p>
+        </div>
+
+        <!-- Horizontal Step Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            <!-- Connectors (Hidden on Mobile) -->
+            <div class="hidden md:block absolute top-16 left-[25%] right-[25%] h-0.5 bg-gradient-to-r from-brand-primary/40 to-brand-accent/40 z-0"></div>
+
+            <!-- Step 1 -->
+            <div class="bg-brand-lightGray rounded-3xl p-8 text-center relative z-10 border border-stone-100 hover:shadow-premium transition-all duration-300 reveal">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-primary text-white font-display font-black text-lg w-12 h-12 rounded-full flex items-center justify-center shadow-glow">
+                    1
+                </div>
+                <div class="bg-white rounded-2xl w-20 h-20 mx-auto flex items-center justify-center shadow-premium text-4xl mb-6">
+                    🛍️
+                </div>
+                <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-3">Create Your List</h3>
+                <p class="text-brand-gray text-sm leading-relaxed font-medium">
+                    Easily search, find, and drop anything from any global storefront right onto your wishlist. Keep tabs on prices and items easily.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-brand-lightGray rounded-3xl p-8 text-center relative z-10 border border-stone-100 hover:shadow-premium transition-all duration-300 reveal">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-primary text-white font-display font-black text-lg w-12 h-12 rounded-full flex items-center justify-center shadow-glow">
+                    2
+                </div>
+                <div class="bg-white rounded-2xl w-20 h-20 mx-auto flex items-center justify-center shadow-premium text-4xl mb-6">
+                    🔗
+                </div>
+                <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-3">Share the Link</h3>
+                <p class="text-brand-gray text-sm leading-relaxed font-medium">
+                    Send your personalized wishlist URL link to friends, coworkers, wedding invites, or family. Easily toggle public or private visibility.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-brand-lightGray rounded-3xl p-8 text-center relative z-10 border border-stone-100 hover:shadow-premium transition-all duration-300 reveal">
+                <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-brand-primary text-white font-display font-black text-lg w-12 h-12 rounded-full flex items-center justify-center shadow-glow">
+                    3
+                </div>
+                <div class="bg-white rounded-2xl w-20 h-20 mx-auto flex items-center justify-center shadow-premium text-4xl mb-6">
+                    🎁
+                </div>
+                <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-3">Receive Your Gifts</h3>
+                <p class="text-brand-gray text-sm leading-relaxed font-medium">
+                    Loved ones chip in or secure individual items. We process the delivery details privately so you receive exactly what you love.
+                </p>
+            </div>
+        </div>
+
+        <!-- Call to Action below -->
+        <div class="mt-16 text-center reveal">
+            <button onclick="openWishlistModal()" class="bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold text-lg px-8 py-4 rounded-full shadow-glow transition duration-300">
+                Start Your Wishlist — It's Free <i class="fa-solid fa-sparkles ml-1"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: FEATURED GIFT CATEGORIES -->
+<section id="categories" class="py-24 bg-brand-lightGray relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-12 reveal">
+            <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Curated Selections</span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark">Featured Gift Categories</h2>
+            <p class="text-brand-gray text-base sm:text-lg">
+                Discover curated wishlists, premium items, and trending gifts for every occasion.
+            </p>
+        </div>
+
+        <!-- Dynamic Category Filter Controls -->
+        <div class="flex flex-wrap justify-center gap-2 mb-12 reveal" id="category-filters">
+            <button onclick="filterCategories('all')" id="cat-btn-all" class="cat-btn active bg-brand-primary text-white font-extrabold py-2.5 px-6 rounded-full shadow-glow transition-all duration-300">
+                All Collections
+            </button>
+            <button onclick="filterCategories('trending')" id="cat-btn-trending" class="cat-btn bg-white text-brand-dark hover:bg-stone-50 font-extrabold py-2.5 px-6 rounded-full shadow-premium transition-all duration-300 border border-stone-100">
+                Trending
+            </button>
+            <button onclick="filterCategories('under-25')" id="cat-btn-under-25" class="cat-btn bg-white text-brand-dark hover:bg-stone-50 font-extrabold py-2.5 px-6 rounded-full shadow-premium transition-all duration-300 border border-stone-100">
+                Under $25
+            </button>
+            <button onclick="filterCategories('luxury')" id="cat-btn-luxury" class="cat-btn bg-white text-brand-dark hover:bg-stone-50 font-extrabold py-2.5 px-6 rounded-full shadow-premium transition-all duration-300 border border-stone-100">
+                Luxury
+            </button>
+        </div>
+
+        <!-- Category Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="categories-grid">
+            
+            <!-- Category Card 1 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="trending font-accent">
+                <div>
+                    <span class="text-4xl mb-4 block">🎂</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Birthdays</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Create a personal registry for your milestone year. Perfect for toys, gadgets, books, or adventure coupons.</p>
+                </div>
+                <button onclick="triggerQuickCart('Birthday Gift Bundle', 45)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Category Card 2 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="luxury">
+                <div>
+                    <span class="text-4xl mb-4 block">💍</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Weddings</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Group funding for honeymoons, premium houseware, and high-value appliances. Share joy seamlessly.</p>
+                </div>
+                <button onclick="triggerQuickCart('Premium Wedding Set', 189)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Category Card 3 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="trending under-25">
+                <div>
+                    <span class="text-4xl mb-4 block">🎄</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Holidays</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Coordinate office secret santas, family holiday wishlists, and warm seasonal deliveries seamlessly.</p>
+                </div>
+                <button onclick="triggerQuickCart('Holiday Magic Box', 24)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Category Card 4 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="under-25">
+                <div>
+                    <span class="text-4xl mb-4 block">🎓</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Graduations</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Help graduates fund college essentials, technical laptops, room decors, or useful moving micro-funds.</p>
+                </div>
+                <button onclick="triggerQuickCart('Smart Grad Planner', 19.99)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Category Card 5 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="trending luxury">
+                <div>
+                    <span class="text-4xl mb-4 block">👶</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Baby Showers</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Perfect baby registry. Include diapers, stroller micro-funds, soft plushies, and nursery supplies easily.</p>
+                </div>
+                <button onclick="triggerQuickCart('Cute Bear Stroller', 299)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Category Card 6 -->
+            <div class="cat-card bg-white rounded-3xl p-8 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 hover:-translate-y-2 flex flex-col justify-between" data-tags="under-25">
+                <div>
+                    <span class="text-4xl mb-4 block">💝</span>
+                    <h3 class="font-display font-extrabold text-2xl text-brand-dark mb-2">Just Because</h3>
+                    <p class="text-brand-gray text-sm leading-relaxed mb-6 font-medium">Surprise someone to brighten their weekday. Best for coffee cards, tiny tokens, and random acts of warmth.</p>
+                </div>
+                <button onclick="triggerQuickCart('Mystery Warm Hug Kit', 15)" class="w-full bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3 rounded-2xl transition-all duration-300 flex items-center justify-center gap-2">
+                    Shop Collection <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 4: TRENDING WISHLISTS / SOCIAL PROOF FEED -->
+<section id="trending" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-16 reveal">
+            <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Live Community Feed</span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark">See What People Are Wishing For</h2>
+            <p class="text-brand-gray text-base sm:text-lg">
+                Discover active gift registries curated by our amazing community. Tap to explore and support!
+            </p>
+        </div>
+
+        <!-- Wishlists Profiles Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Wishlist Card 1 -->
+            <div class="bg-brand-lightGray rounded-3xl p-6 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 reveal flex flex-col justify-between">
+                <div>
+                    <!-- Profile Header -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-display font-black text-lg shadow-glow">
+                            SM
+                        </div>
+                        <div>
+                            <h4 class="font-display font-extrabold text-brand-dark text-lg leading-tight">Sarah Miller</h4>
+                            <span class="text-xs text-brand-primary font-black uppercase tracking-wider font-display">Birthday List 🎂</span>
+                        </div>
+                    </div>
+                    <!-- Wishlist Summary Stats -->
+                    <div class="bg-white rounded-2xl p-4 border border-stone-100 space-y-3 mb-6">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Total Items Requested:</span>
+                            <span class="font-extrabold text-brand-dark">12 items</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Value Secured:</span>
+                            <span class="font-extrabold text-brand-success font-display">65% Claimed</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm pt-2 border-t border-stone-50">
+                            <span class="text-brand-gray font-bold">Total Budget:</span>
+                            <span class="font-black text-brand-dark font-display">$340 total</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Button -->
+                <button onclick="triggerQuickCart('Contrib on Sarah\'s Registry', 25)" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-3.5 rounded-2xl transition duration-200 shadow-glow flex items-center justify-center gap-2">
+                    <span>View Sarah's Wishlist</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Wishlist Card 2 -->
+            <div class="bg-brand-lightGray rounded-3xl p-6 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 reveal flex flex-col justify-between">
+                <div>
+                    <!-- Profile Header -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-[#1AC1FF] text-white flex items-center justify-center font-display font-black text-lg">
+                            KC
+                        </div>
+                        <div>
+                            <h4 class="font-display font-extrabold text-brand-dark text-lg leading-tight">Kaitlyn & Chris</h4>
+                            <span class="text-xs text-[#1AC1FF] font-black uppercase tracking-wider font-display">Wedding Registry 💍</span>
+                        </div>
+                    </div>
+                    <!-- Wishlist Summary Stats -->
+                    <div class="bg-white rounded-2xl p-4 border border-stone-100 space-y-3 mb-6">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Total Items Requested:</span>
+                            <span class="font-extrabold text-brand-dark">34 items</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Value Secured:</span>
+                            <span class="font-extrabold text-brand-success font-display">42% Claimed</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm pt-2 border-t border-stone-50">
+                            <span class="text-brand-gray font-bold">Total Budget:</span>
+                            <span class="font-black text-brand-dark font-display">$2,450 total</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Button -->
+                <button onclick="triggerQuickCart('Contrib on Kaitlyn\'s Registry', 50)" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-3.5 rounded-2xl transition duration-200 shadow-glow flex items-center justify-center gap-2">
+                    <span>View Kaitlyn's Wishlist</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Wishlist Card 3 -->
+            <div class="bg-brand-lightGray rounded-3xl p-6 border border-stone-100 shadow-premium hover:shadow-card-hover transition-all duration-300 reveal flex flex-col justify-between">
+                <div>
+                    <!-- Profile Header -->
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-brand-accent text-brand-dark flex items-center justify-center font-display font-black text-lg">
+                            DB
+                        </div>
+                        <div>
+                            <h4 class="font-display font-extrabold text-brand-dark text-lg leading-tight">Danielle B.</h4>
+                            <span class="text-xs text-brand-accent text-stone-700 font-black uppercase tracking-wider font-display">Baby Shower 👶</span>
+                        </div>
+                    </div>
+                    <!-- Wishlist Summary Stats -->
+                    <div class="bg-white rounded-2xl p-4 border border-stone-100 space-y-3 mb-6">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Total Items Requested:</span>
+                            <span class="font-extrabold text-brand-dark">18 items</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-brand-gray font-medium">Value Secured:</span>
+                            <span class="font-extrabold text-brand-success font-display">80% Claimed</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm pt-2 border-t border-stone-50">
+                            <span class="text-brand-gray font-bold">Total Budget:</span>
+                            <span class="font-black text-brand-dark font-display">$680 total</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Button -->
+                <button onclick="triggerQuickCart('Contrib on Danielle\'s Registry', 30)" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-3.5 rounded-2xl transition duration-200 shadow-glow flex items-center justify-center gap-2">
+                    <span>View Danielle's Wishlist</span> <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 5: FEATURES / VALUE PROPOSITION -->
+<section id="features" class="py-24 bg-brand-dark text-white relative overflow-hidden">
+    <!-- Geometric backdrop vectors -->
+    <div class="absolute inset-0 bg-[radial-gradient(#FF4F72_0.8px,transparent_0.8px)] [background-size:24px_24px] opacity-10 pointer-events-none"></div>
+    <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-brand-primary/15 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-brand-accent/15 blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-20 reveal">
+            <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Better Gifting Architecture</span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-white">Why Gift Through BuyMe?</h2>
+            <p class="text-stone-400 text-base sm:text-lg">
+                We've combined world-class wishlist software with flexible community-focused social features to optimize your gifting experience.
+            </p>
+        </div>
+
+        <!-- 2x2 Feature Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            
+            <!-- Block 1 -->
+            <div class="bg-brand-darkCard p-8 rounded-3xl border border-white/5 shadow-2xl flex items-start space-x-6 reveal">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary/10 text-brand-primary text-3xl shrink-0">
+                    🛍️
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-white mb-2">Add From Any Store</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">
+                        Never limit your requests. Link products from Amazon, Etsy, Apple, luxury boutiques, or even coordinate local services in one beautiful registry space.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Block 2 -->
+            <div class="bg-brand-darkCard p-8 rounded-3xl border border-white/5 shadow-2xl flex items-start space-x-6 reveal">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-accent/10 text-brand-accent text-3xl shrink-0">
+                    🔔
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-white mb-2">Get Notified Instantly</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">
+                        Stay dynamically linked with real-time push alerts and emails immediately when someone reserves or purchases an item from your wishlist space.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Block 3 -->
+            <div class="bg-brand-darkCard p-8 rounded-3xl border border-white/5 shadow-2xl flex items-start space-x-6 reveal">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary/10 text-brand-primary text-3xl shrink-0">
+                    👥
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-white mb-2">Group Gifting Enabled</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">
+                        Co-fund dream vacations or high-ticket appliances effortlessly. Let multiple friends or office coworkers pitch in contributions of any size towards the total cost.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Block 4 -->
+            <div class="bg-brand-darkCard p-8 rounded-3xl border border-white/5 shadow-2xl flex items-start space-x-6 reveal">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-accent/10 text-brand-accent text-3xl shrink-0">
+                    💳
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-white mb-2">Universal Direct Checkout</h3>
+                    <p class="text-stone-400 text-sm leading-relaxed">
+                        Gifters don't have to navigate external sites or enter endless payment systems. Secure one-click checkout keeps payments protected in one dashboard.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-16 text-center reveal">
+            <button onclick="openWishlistModal()" class="inline-flex items-center space-x-2 bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold px-8 py-4 rounded-full shadow-glow transition duration-300">
+                <span>Start Group Gifting</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 6: TESTIMONIALS -->
+<section id="testimonials" class="py-24 bg-[#FCFCFD] relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Grid Header layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
+            <div class="lg:col-span-7 space-y-4 reveal">
+                <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Spreading Joy Worldwide</span>
+                <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark leading-tight">Shared Smiles & Loved Gifts</h2>
+                <p class="text-brand-gray text-base sm:text-lg leading-relaxed">
+                    Check out what our global community members say about creating registries, gifting their loved ones, and receiving support.
+                </p>
+            </div>
+            <div class="lg:col-span-5 flex justify-center lg:justify-end reveal">
+                <div class="bg-white p-6 rounded-3xl border border-stone-100 shadow-premium text-center">
+                    <div class="flex items-center justify-center space-x-1 text-brand-accent mb-2">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="font-display font-extrabold text-lg text-brand-dark">4.9 / 5.0 Global Rating</p>
+                    <p class="text-xs text-brand-gray">Over 120,000 verified platform reviews</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Card 1 -->
+            <div class="bg-white p-8 rounded-3xl border-l-4 border-l-brand-primary border-t border-r border-b border-stone-100 shadow-premium flex flex-col justify-between hover:shadow-card-hover transition-all duration-300 reveal">
+                <div>
+                    <div class="flex items-center space-x-1 text-brand-accent mb-4">
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                    </div>
+                    <p class="text-brand-gray italic text-sm sm:text-base leading-relaxed mb-6 font-medium">
+                        "I shared my 25th birthday list on my Instagram profile, and I got every single thing on it! BuyMe.com is absolute magic. No duplicate gifts, just items I truly needed!"
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3 pt-4 border-t border-stone-50">
+                    <div class="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary font-display font-black text-sm flex items-center justify-center">JL</div>
+                    <div>
+                        <h4 class="font-display font-extrabold text-sm text-brand-dark">Jamie L.</h4>
+                        <p class="text-[11px] text-brand-primary font-extrabold uppercase font-display tracking-wider">Birthday Wishlist 🎂</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white p-8 rounded-l-none rounded-r-3xl border-l-4 border-l-brand-primary border-t border-r border-b border-stone-100 shadow-premium flex flex-col justify-between hover:shadow-card-hover transition-all duration-300 reveal">
+                <div>
+                    <div class="flex items-center space-x-1 text-brand-accent mb-4">
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                    </div>
+                    <p class="text-brand-gray italic text-sm sm:text-base leading-relaxed mb-6 font-medium">
+                        "Our wedding registry experience was seamless. Family from all over the world contributed to our honeymoon flights fund in just single-click increments. Absolute recommend!"
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3 pt-4 border-t border-stone-50">
+                    <div class="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary font-display font-black text-sm flex items-center justify-center">MH</div>
+                    <div>
+                        <h4 class="font-display font-extrabold text-sm text-brand-dark">Marcus & Hailey</h4>
+                        <p class="text-[11px] text-brand-primary font-extrabold uppercase font-display tracking-wider">Wedding registry 💍</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white p-8 rounded-l-none rounded-r-3xl border-l-4 border-l-brand-primary border-t border-r border-b border-stone-100 shadow-premium flex flex-col justify-between hover:shadow-card-hover transition-all duration-300 reveal">
+                <div>
+                    <div class="flex items-center space-x-1 text-brand-accent mb-4">
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                        <i class="fa-solid fa-star text-sm"></i>
+                    </div>
+                    <p class="text-brand-gray italic text-sm sm:text-base leading-relaxed mb-6 font-medium">
+                        "As a new parent, navigating gift requests can be overwhelming. BuyMe made it incredibly fun and easy to configure baby shower items and monitor group-funding items!"
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3 pt-4 border-t border-stone-50">
+                    <div class="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary font-display font-black text-sm flex items-center justify-center">SA</div>
+                    <div>
+                        <h4 class="font-display font-extrabold text-sm text-brand-dark">Sarah A.</h4>
+                        <p class="text-[11px] text-brand-primary font-extrabold uppercase font-display tracking-wider">Baby Shower List 👶</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 7: PRICING / PLANS -->
+<section id="pricing" class="py-24 bg-brand-lightGray relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-12 reveal">
+            <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Simple Subscriptions</span>
+            <h2 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark">Choose the Perfect Plan</h2>
+            <p class="text-brand-gray text-base sm:text-lg">
+                Start sharing wishlists absolutely free, or unlock advanced customization and priority support as you grow.
+            </p>
+
+            <!-- Pricing Toggle Control -->
+            <div class="pt-6 flex items-center justify-center space-x-4">
+                <span class="text-sm font-extrabold text-brand-dark" id="billing-monthly-label">Monthly</span>
+                <label for="billing-cycle-toggle" class="relative inline-flex items-center cursor-pointer select-none">
+                    <input type="checkbox" id="billing-cycle-toggle" onchange="toggleBillingCycle()" class="sr-only">
+                    <div class="w-14 h-8 bg-brand-primary rounded-full border border-stone-200 shadow-sm transition-colors"></div>
+                    <div class="toggle-dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full shadow-md"></div>
+                </label>
+                <span class="text-sm font-extrabold text-brand-gray" id="billing-yearly-label">Yearly</span>
+                <span class="bg-brand-accent text-stone-800 text-xxs font-black px-2.5 py-1 rounded-full uppercase tracking-wider font-display">Save 20%</span>
+            </div>
+        </div>
+
+        <!-- Tier Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            
+            <!-- Plan 1: Free -->
+            <div class="bg-white rounded-3xl p-8 border border-stone-100 shadow-premium flex flex-col justify-between reveal">
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-brand-dark mb-2">Free Starter</h3>
+                    <p class="text-xs text-brand-gray mb-6 font-medium">Perfect for individual birthday celebrations.</p>
+                    <div class="mb-6">
+                        <span class="font-display font-black text-5xl text-brand-dark">$0</span>
+                        <span class="text-brand-gray font-bold text-sm">/ month</span>
+                    </div>
+                    <ul class="space-y-3.5 text-brand-gray text-sm font-semibold border-t border-stone-100 pt-6">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> 1 Active Wishlist</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Unlimited Wishlist Shares</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Standard Gift Finder tool</li>
+                        <li class="flex items-center gap-2 text-stone-300 line-through"><i class="fa-solid fa-xmark"></i> Universal Checkout</li>
+                        <li class="flex items-center gap-2 text-stone-300 line-through"><i class="fa-solid fa-xmark"></i> Advanced Co-Funding</li>
+                    </ul>
+                </div>
+                <button onclick="openWishlistModal()" class="w-full mt-8 bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3.5 rounded-2xl transition duration-200">
+                    Get Started Free
+                </button>
+            </div>
+
+            <!-- Plan 2: Plus (Most Popular Accent Card) -->
+            <div class="bg-white rounded-3xl p-8 border-2 border-brand-primary shadow-2xl flex flex-col justify-between relative transform hover:scale-[1.02] transition-transform duration-300 reveal">
+                <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-accent text-stone-800 font-display font-black text-xs uppercase tracking-widest py-1.5 px-4 rounded-full shadow-md border border-stone-100">Most Popular</span>
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-brand-dark mb-2">BuyMe Plus</h3>
+                    <p class="text-xs text-brand-gray mb-6 font-medium">Optimal setup for wedding couples & baby showers.</p>
+                    <div class="mb-6">
+                        <span class="font-display font-black text-5xl text-brand-dark" id="plan-plus-price">$4.99</span>
+                        <span class="text-brand-gray font-bold text-sm">/ month</span>
+                    </div>
+                    <ul class="space-y-3.5 text-brand-gray text-sm font-semibold border-t border-stone-100 pt-6">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Unlimited Active Wishlists</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Universal Checkout Enabled</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Group Gifting / Co-funding</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Thank-You Note Creator</li>
+                        <li class="flex items-center gap-2 text-stone-300 line-through"><i class="fa-solid fa-xmark"></i> Tailored Page Customizations</li>
+                    </ul>
+                </div>
+                <button onclick="triggerQuickCart('BuyMe Plus Subscription', 4.99)" class="w-full mt-8 bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-3.5 rounded-2xl transition duration-200 shadow-glow">
+                    Start Plus Trial
+                </button>
+            </div>
+
+            <!-- Plan 3: Premium -->
+            <div class="bg-white rounded-3xl p-8 border border-stone-100 shadow-premium flex flex-col justify-between reveal">
+                <div>
+                    <h3 class="font-display font-extrabold text-xl text-brand-dark mb-2">BuyMe Premium</h3>
+                    <p class="text-xs text-brand-gray mb-6 font-medium">Best for creators and massive event registries.</p>
+                    <div class="mb-6">
+                        <span class="font-display font-black text-5xl text-brand-dark" id="plan-prem-price">$9.99</span>
+                        <span class="text-brand-gray font-bold text-sm">/ month</span>
+                    </div>
+                    <ul class="space-y-3.5 text-brand-gray text-sm font-semibold border-t border-stone-100 pt-6">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Everything in Plus included</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Analytics & Views Dashboard</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Tailored Page Customizations</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Priority 24/7 Support Desk</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Exclusive Partner Offers</li>
+                    </ul>
+                </div>
+                <button onclick="triggerQuickCart('BuyMe Premium Subscription', 9.99)" class="w-full mt-8 bg-brand-lightGray hover:bg-brand-primary hover:text-white text-brand-dark font-extrabold py-3.5 rounded-2xl transition duration-200">
+                    Get Premium Now
+                </button>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 8: GIFT FINDER TOOL -->
+<section id="gift-finder" class="py-24 bg-white relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- Left Area Block -->
+            <div class="lg:col-span-5 space-y-6 reveal">
+                <span class="text-brand-primary font-extrabold text-xs sm:text-sm uppercase tracking-widest font-display">Stuck for Ideas?</span>
+                <h2 class="font-display font-black text-3xl sm:text-4xl text-brand-dark leading-tight">Interactive Gift Finder</h2>
+                <p class="text-brand-gray text-base leading-relaxed font-medium">
+                    Not sure what to gift? No worries! Choose your recipient's profile specifications below, and our search tool will match top curated results instantly.
+                </p>
+
+                <!-- Interactive drop selectors -->
+                <form id="finder-form" onsubmit="processGiftFind(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-2 font-display">Occasion</label>
+                        <select id="finder-occasion" required class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-2xl py-4 px-4 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none transition-all">
+                            <option value="">Select occasion...</option>
+                            <option value="birthday">Birthday Party 🎂</option>
+                            <option value="wedding">Wedding Registry 💍</option>
+                            <option value="holiday">Holidays 🎄</option>
+                            <option value="graduation">Graduation Day 🎓</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-2 font-display">Budget Range</label>
+                            <select id="finder-budget" required class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-2xl py-4 px-4 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none transition-all">
+                                <option value="">Select budget...</option>
+                                <option value="low">Under $25</option>
+                                <option value="mid">$25 - $100</option>
+                                <option value="high">Luxury ($100+)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-2 font-display">Relationship</label>
+                            <select id="finder-relation" required class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-2xl py-4 px-4 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none transition-all">
+                                <option value="">Who is it for?</option>
+                                <option value="friend">Friend</option>
+                                <option value="partner">Partner</option>
+                                <option value="parent">Parent</option>
+                                <option value="child">Child</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-4 rounded-2xl shadow-glow transition duration-200">
+                        Find the Perfect Gift <i class="fa-solid fa-magnifying-glass ml-1.5"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Results Display Area -->
+            <div class="lg:col-span-7 reveal">
+                <div class="bg-brand-lightGray rounded-3xl p-6 sm:p-8 border border-stone-100 shadow-xl space-y-6 min-h-[440px] flex flex-col justify-center relative">
+                    
+                    <!-- Search Indicator Default view -->
+                    <div id="finder-placeholder-view" class="text-center py-12 space-y-4">
+                        <span class="text-5xl animate-bounce inline-block">🎁</span>
+                        <h3 class="font-display font-black text-xl text-brand-dark">Configure Gift Filter Parameters</h3>
+                        <p class="text-xs text-brand-gray max-w-sm mx-auto font-medium">Choose your options on the left to activate our instant Gift Engine recommendations.</p>
+                    </div>
+
+                    <!-- Loader (Hidden default) -->
+                    <div id="finder-loader-view" class="hidden text-center py-12 space-y-4">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-brand-primary"></i>
+                        <h3 class="font-display font-bold text-lg text-brand-dark">Matching ideal gifts...</h3>
+                    </div>
+
+                    <!-- Results List Block (Hidden default) -->
+                    <div id="finder-results-view" class="hidden space-y-4">
+                        <h3 class="font-display font-extrabold text-lg text-brand-dark flex items-center justify-between mb-4">
+                            <span>Matched Perfect Gifts</span>
+                            <span class="text-[10px] bg-brand-primary/10 text-brand-primary py-1 px-3 rounded-full font-black uppercase tracking-wider font-display">Verified Matches</span>
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="finder-cards-container">
+                            <!-- Dynamic recommendations injected here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 9: EMAIL CAPTURE / LEAD MAGNET -->
+<section class="py-24 bg-gradient-to-r from-brand-primary via-[#FF758F] to-brand-accent text-white relative overflow-hidden">
+    <div class="absolute right-0 top-0 w-96 h-96 rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
+    <div class="absolute left-10 bottom-0 w-80 h-80 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
+        <span class="bg-white/15 border border-white/20 rounded-full py-1.5 px-4 text-white text-xs sm:text-sm font-extrabold tracking-wider font-display uppercase">Limited Time Welcome Offer</span>
+        
+        <h2 class="font-display font-black text-3xl sm:text-5xl md:text-6xl leading-tight text-white drop-shadow-sm">
+            Get $10 Off Your First Gift
+        </h2>
+        
+        <p class="text-white/90 text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+            Join over 500,000+ happy active gifters worldwide. Receive instant gift alerts, weekly trends, and secret coupons. No spam, ever.
+        </p>
+
+        <!-- Newsletter Submit form -->
+        <form onsubmit="handleClaimCoupon(event)" class="max-w-md mx-auto flex flex-col sm:flex-row gap-3 pt-4">
+            <input type="email" id="subscriber-email" required placeholder="Enter your best email address..." 
+                   class="flex-grow px-6 py-4 rounded-full border-none focus:outline-none text-brand-dark font-semibold shadow-premium placeholder-stone-400">
+            <button type="submit" class="bg-brand-dark hover:bg-brand-darkCard text-white font-extrabold px-8 py-4 rounded-full shadow-glow transition duration-300 whitespace-nowrap active:scale-95">
+                Claim My $10 <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </form>
+        
+        <p class="text-[11px] text-white/70 font-medium">
+            By clicking, you accept standard messaging conditions. View our <a href="#" onclick="showCustomNotification('Privacy Policy', 'Standard platform security terms simulated.', 'fa-lock')" class="underline hover:text-white">Privacy Policy</a>.
+        </p>
+    </div>
+</section>
+
+<!-- SECTION 10: FOOTER -->
+<footer class="bg-brand-dark text-white pt-20 pb-12 relative border-t-8 border-brand-primary">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        <!-- Grid layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
+            
+            <!-- Brand Column -->
+            <div class="lg:col-span-4 space-y-6">
+                <span class="font-display font-black text-3xl tracking-tight text-white block">
+                    BuyMe<span class="text-brand-primary">.com</span>
+                </span>
+                <p class="text-stone-400 text-sm leading-relaxed max-w-sm font-medium">
+                    Making wishlist creation, sharing, and group gifting incredibly fun, safe, and collaborative since 2024.
+                </p>
+                <!-- Social Channels -->
+                <div class="flex items-center space-x-3 pt-2">
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 hover:bg-brand-primary hover:text-white flex items-center justify-center text-stone-300 transition-all duration-300" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 hover:bg-brand-primary hover:text-white flex items-center justify-center text-stone-300 transition-all duration-300" aria-label="TikTok">
+                        <i class="fa-brands fa-tiktok"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 hover:bg-brand-primary hover:text-white flex items-center justify-center text-stone-300 transition-all duration-300" aria-label="Pinterest">
+                        <i class="fa-brands fa-pinterest"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 hover:bg-brand-primary hover:text-white flex items-center justify-center text-stone-300 transition-all duration-300" aria-label="Twitter">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <h4 class="font-display font-extrabold text-sm uppercase tracking-wider text-brand-accent">Product</h4>
+                <ul class="space-y-3.5 text-stone-400 text-sm font-semibold">
+                    <li><a href="#how-it-works" class="hover:text-white transition">How It Works</a></li>
+                    <li><a href="#categories" class="hover:text-white transition">Gifting Directory</a></li>
+                    <li><a href="#pricing" class="hover:text-white transition">Pricing Tiers</a></li>
+                    <li><a href="#gift-finder" class="hover:text-white transition">Gift Finder</a></li>
+                    <li><a href="#" onclick="openWishlistModal()" class="hover:text-white transition">Create Registry</a></li>
+                </ul>
+            </div>
+
+            <!-- Company Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <h4 class="font-display font-extrabold text-sm uppercase tracking-wider text-brand-accent">Company</h4>
+                <ul class="space-y-3.5 text-stone-400 text-sm font-semibold">
+                    <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                    <li><a href="#" class="hover:text-white transition">Press Kit</a></li>
+                    <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                    <li><a href="#" class="hover:text-white transition">Brand Assets</a></li>
+                    <li><a href="#" class="hover:text-white transition">Security Hub</a></li>
+                </ul>
+            </div>
+
+            <!-- Mini News Form Column -->
+            <div class="lg:col-span-4 space-y-6">
+                <h4 class="font-display font-extrabold text-sm uppercase tracking-wider text-brand-accent">Subscribe To Trends</h4>
+                <p class="text-stone-400 text-sm font-medium">
+                    Weekly drops of trending products and custom wishlist aesthetics. No spam.
+                </p>
+                <form onsubmit="handleClaimCoupon(event)" class="flex gap-2">
+                    <input type="email" required placeholder="Email..." class="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm w-full focus:outline-none focus:border-brand-primary text-white font-medium">
+                    <button type="submit" class="bg-brand-primary hover:bg-brand-primaryHover text-white px-4 rounded-xl transition font-extrabold"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- Copyright Info -->
+        <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-stone-500 font-semibold">
+            <p>© 2026 BuyMe.com Inc. All rights reserved. "Wish it. Share it. Receive it." is a trademark of BuyMe Properties, Inc.</p>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <span>•</span>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+                <span>•</span>
+                <a href="#" class="hover:text-white transition">Ad Choices</a>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+<!-- General Modal Overlay Backdrop -->
+<div id="general-modal-overlay" class="fixed inset-0 bg-brand-dark/50 opacity-0 pointer-events-none transition-opacity duration-300 z-40"></div>
+
+<!-- Interactive Wishlist Configurator Modal -->
+<div id="wishlist-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden relative border border-stone-100 transform translate-y-4 transition-transform duration-300">
+        <!-- Close -->
+        <button onclick="closeWishlistModal()" class="absolute top-5 right-5 text-stone-400 hover:text-brand-primary p-2 transition">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+        <!-- Title Banner -->
+        <div class="bg-gradient-to-r from-brand-primary to-[#FF758F] text-white p-6 pt-8">
+            <h3 class="font-display font-black text-2xl">Create Your Wishlist</h3>
+            <p class="text-xs text-white/85">Configure your custom registry page in just seconds!</p>
+        </div>
+        <!-- Form body -->
+        <form onsubmit="handleCreateWishlistSubmit(event)" class="p-6 space-y-4 bg-white">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-1.5 font-display">Full Name</label>
+                    <input type="text" id="wishlist-fullname" required placeholder="Sarah Miller" class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-xl p-3 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-1.5 font-display">Username Profile ID</label>
+                    <div class="flex items-center">
+                        <span class="bg-stone-100 border-2 border-r-0 border-stone-100 rounded-l-xl p-3 text-xs text-stone-500 font-extrabold font-display">buyme.com/</span>
+                        <input type="text" id="wishlist-username" required placeholder="sarah" class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-r-xl p-3 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-1.5 font-display">Event Occasion</label>
+                    <select id="wishlist-occasion" required class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-xl p-3 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none">
+                        <option value="birthday">Birthday 🎂</option>
+                        <option value="wedding">Wedding 💍</option>
+                        <option value="holidays">Holidays 🎄</option>
+                        <option value="baby-shower">Baby Shower 👶</option>
+                        <option value="other">Other Event 💝</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-1.5 font-display">Wishlist Goal Budget ($)</label>
+                    <input type="number" id="wishlist-budget" required min="10" value="500" class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-xl p-3 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-black text-brand-gray uppercase tracking-wider mb-1.5 font-display">Short Description</label>
+                <textarea rows="2" placeholder="Help me fund essentials for my milestone birthday! Thanks friends..." class="w-full bg-brand-lightGray border-2 border-stone-100 rounded-xl p-3 text-sm font-semibold text-brand-dark focus:border-brand-primary focus:outline-none"></textarea>
+            </div>
+            <div class="flex items-center space-x-2.5 py-1">
+                <input type="checkbox" required id="wishlist-consent" class="rounded border-stone-300 text-brand-primary focus:ring-brand-primary">
+                <label for="wishlist-consent" class="text-[11px] text-brand-gray font-semibold leading-tight">I consent to creating my BuyMe index and accept standard safety codes.</label>
+            </div>
+            <button type="submit" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-extrabold py-3.5 rounded-2xl transition duration-200 shadow-glow">
+                Activate My Wishlist <i class="fa-solid fa-sparkles ml-1"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Initialize standard state variables
+    let pricingCycle = 'monthly'; // 'monthly' | 'yearly'
+
+    // Static product recommendations database for the Interactive Gift Finder Tool
+    const giftFinderDB = {
+        birthday: {
+            low: [
+                { name: "Premium Coffee Grinder", price: "18.99", tags: "friend", emoji: "☕" },
+                { name: "Scented Lavender Candle", price: "14.50", tags: "partner", emoji: "🕯️" },
+                { name: "Retro Leather Journal", price: "22.00", tags: "friend", emoji: "📓" }
+            ],
+            mid: [
+                { name: "Mechanical Gaming Keyboard", price: "79.00", tags: "friend", emoji: "⌨️" },
+                { name: "Silk Soft Pajama Set", price: "65.00", tags: "partner", emoji: "👘" },
+                { name: "Elegant Desktop Organiser", price: "45.00", tags: "parent", emoji: "📁" }
+            ],
+            high: [
+                { name: "Noise-Cancelling Headphones", price: "249.00", tags: "partner", emoji: "🎧" },
+                { name: "Design Espresso Maker", price: "599.00", tags: "parent", emoji: "☕" },
+                { name: "Smart Fitness Watch", price: "199.00", tags: "friend", emoji: "⌚" }
+            ]
+        },
+        wedding: {
+            low: [
+                { name: "Personalized Wedding Frame", price: "19.99", tags: "friend", emoji: "🖼️" },
+                { name: "Monogrammed Hand Towels", price: "24.50", tags: "partner", emoji: "🧼" },
+                { name: "Cozy Kitchen Mitts", price: "15.00", tags: "parent", emoji: "🧤" }
+            ],
+            mid: [
+                { name: "Premium Dinner Plate Set", price: "85.00", tags: "friend", emoji: "🍽️" },
+                { name: "Retro Picnic Basket For 2", price: "69.00", tags: "partner", emoji: "🧺" },
+                { name: "Premium French Press Set", price: "49.00", tags: "parent", emoji: "☕" }
+            ],
+            high: [
+                { name: "Ultra HD Smart Projector", price: "499.00", tags: "partner", emoji: "📹" },
+                { name: "Pro Series Kitchen Mixer", price: "349.00", tags: "parent", emoji: "🧁" },
+                { name: "Premium Luxury Towel Warmer", price: "159.00", tags: "friend", emoji: "🚿" }
+            ]
+        },
+        holiday: {
+            low: [
+                { name: "Warm Velvet Slippers", price: "15.99", tags: "friend", emoji: "🥿" },
+                { name: "Holiday Cocoa Magic Mug", price: "12.50", tags: "friend", emoji: "☕" },
+                { name: "Custom Name Ornament", price: "19.00", tags: "parent", emoji: "🎄" }
+            ],
+            mid: [
+                { name: "Cozy Cashmere Blend Scarf", price: "55.00", tags: "partner", emoji: "🧣" },
+                { name: "Cheese Board Serving Set", price: "45.00", tags: "friend", emoji: "🧀" },
+                { name: "Aromatherapy Oil Diffuser", price: "39.99", tags: "parent", emoji: "🌬️" }
+            ],
+            high: [
+                { name: "Designer Leather Duffel Bag", price: "189.00", tags: "partner", emoji: "👜" },
+                { name: "Massage Cushion Gun Pro", price: "149.00", tags: "parent", emoji: "🔫" },
+                { name: "Handmade Premium Wood Chess", price: "120.00", tags: "friend", emoji: "♟️" }
+            ]
+        },
+        graduation: {
+            low: [
+                { name: "Premium Minimalist Wallet", price: "24.00", tags: "friend", emoji: "💳" },
+                { name: "Daily Planner Notebook", price: "15.50", tags: "friend", emoji: "📓" },
+                { name: "Stainless Steel Travel Tumbler", price: "22.00", tags: "child", emoji: "🥛" }
+            ],
+            mid: [
+                { name: "Fast Wireless Charging Hub", price: "49.00", tags: "friend", emoji: "🔌" },
+                { name: "Professional Portfolio Case", price: "75.00", tags: "child", emoji: "📁" },
+                { name: "Ergonomic Office Lumbar Pillow", price: "39.00", tags: "parent", emoji: "💺" }
+            ],
+            high: [
+                { name: "Designer Ergonomic Chair", price: "329.00", tags: "child", emoji: "💺" },
+                { name: "Active Noise Earbuds Pro", price: "199.00", tags: "partner", emoji: "🎧" },
+                { name: "Pro Tech Backpack Shield", price: "149.00", tags: "friend", emoji: "🎒" }
+            ]
+        }
+    };
+
+    // Trigger actions on startup
+    window.onload = function () {
+        // Sticky Header Morph on Scroll Event observer
+        window.addEventListener('scroll', handleHeaderMorph);
+
+        // Mobile Menu setups
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('mobile-close-btn');
+        const overlay = document.getElementById('mobile-overlay');
+
+        if (menuBtn && closeBtn && overlay) {
+            menuBtn.addEventListener('click', toggleMobileMenu);
+            closeBtn.addEventListener('click', toggleMobileMenu);
+            overlay.addEventListener('click', toggleMobileMenu);
+        }
+
+        // Setup Scroll Reveal Intersection Observer elements
+        setupScrollReveal();
+
+        // Control Mobile Sticky Bar Visibility Based on Scroll Location
+        window.addEventListener('scroll', handleMobileBarVisibility);
+    };
+
+    // Scroll Reveal trigger animation using IntersectionObserver
+    function setupScrollReveal() {
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.08
+        });
+
+        reveals.forEach(reveal => {
+            observer.observe(reveal);
+        });
+    }
+
+    // Morph navigation bar header transparent -> colored on scrolls
+    function handleHeaderMorph() {
+        const header = document.getElementById('main-header');
+        if (window.scrollY > 40) {
+            header.classList.remove('bg-transparent', 'py-5');
+            header.classList.add('bg-white/95', 'backdrop-blur-md', 'py-4', 'shadow-premium');
+        } else {
+            header.classList.remove('bg-white/95', 'backdrop-blur-md', 'py-4', 'shadow-premium');
+            header.classList.add('bg-transparent', 'py-5');
+        }
+    }
+
+    // Toggle Mobile Drawer Menu
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const overlay = document.getElementById('mobile-overlay');
+
+        if (mobileMenu.classList.contains('translate-x-full')) {
+            mobileMenu.classList.remove('translate-x-full');
+            mobileMenu.classList.add('translate-x-0');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('opacity-40');
+        } else {
+            mobileMenu.classList.remove('translate-x-0');
+            mobileMenu.classList.add('translate-x-full');
+            overlay.classList.remove('opacity-40');
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+    }
+
+    // Control Mobile Sticky Bar Visibility Based on Scroll Location
+    function handleMobileBarVisibility() {
+        const stickyBar = document.getElementById('sticky-mobile-bar');
+        // Hide if at the very top of screen
+        if (window.scrollY < 120) {
+            stickyBar.classList.add('translate-y-full');
+        } else {
+            stickyBar.classList.remove('translate-y-full');
+        }
+    }
+
+    // Toggle Modal Overlays
+    function openWishlistModal() {
+        const modal = document.getElementById('wishlist-modal');
+        const overlay = document.getElementById('general-modal-overlay');
+        
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100');
+        modal.querySelector('.transform').classList.remove('translate-y-4');
+    }
+
+    function closeWishlistModal() {
+        const modal = document.getElementById('wishlist-modal');
+        const overlay = document.getElementById('general-modal-overlay');
+        
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100');
+        modal.querySelector('.transform').classList.add('translate-y-4');
+    }
+
+    // Category Filter Grid trigger logic
+    function filterCategories(tagName) {
+        // Remove active class from buttons
+        const buttons = document.querySelectorAll('#category-filters .cat-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-brand-primary', 'text-white', 'shadow-glow');
+            btn.classList.add('bg-white', 'text-brand-dark', 'shadow-premium');
+        });
+
+        // Set active button
+        const activeBtn = document.getElementById(`cat-btn-${tagName}`);
+        if(activeBtn) {
+            activeBtn.classList.add('bg-brand-primary', 'text-white', 'shadow-glow');
+            activeBtn.classList.remove('bg-white', 'text-brand-dark', 'shadow-premium');
+        }
+
+        // Filter Grid Cards
+        const cards = document.querySelectorAll('#categories-grid .cat-card');
+        cards.forEach(card => {
+            const cardTags = card.getAttribute('data-tags');
+            if (tagName === 'all' || cardTags.includes(tagName)) {
+                card.style.display = 'flex';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 40);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(15px)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 200);
+            }
+        });
+    }
+
+    // Toggle Billing Cycle Calculation (Discount)
+    function toggleBillingCycle() {
+        const toggle = document.getElementById('billing-cycle-toggle');
+        const planPlusText = document.getElementById('plan-plus-price');
+        const planPremText = document.getElementById('plan-prem-price');
+        const labelMonthly = document.getElementById('billing-monthly-label');
+        const labelYearly = document.getElementById('billing-yearly-label');
+
+        if(toggle.checked) {
+            // Yearly Plan selected (20% off)
+            pricingCycle = 'yearly';
+            planPlusText.innerText = '$3.99';
+            planPremText.innerText = '$7.99';
+            labelMonthly.classList.remove('text-brand-dark');
+            labelMonthly.classList.add('text-brand-gray');
+            labelYearly.classList.remove('text-brand-gray');
+            labelYearly.classList.add('text-brand-dark');
+            showCustomNotification("Annual Cycle Set", "Enjoy 20% discount on all active plans!", "fa-percent");
+        } else {
+            // Monthly Plan selected
+            pricingCycle = 'monthly';
+            planPlusText.innerText = '$4.99';
+            planPremText.innerText = '$9.99';
+            labelMonthly.classList.remove('text-brand-gray');
+            labelMonthly.classList.add('text-brand-dark');
+            labelYearly.classList.remove('text-brand-dark');
+            labelYearly.classList.add('text-brand-gray');
+            showCustomNotification("Monthly Cycle Set", "Plan billed standard rates.", "fa-calendar");
+        }
+    }
+
+    // Process Gift Finder Recommendation Tool Request
+    function processGiftFind(event) {
+        event.preventDefault();
+
+        // UI Target nodes
+        const placeholderView = document.getElementById('finder-placeholder-view');
+        const loaderView = document.getElementById('finder-loader-view');
+        const resultsView = document.getElementById('finder-results-view');
+        const cardContainer = document.getElementById('finder-cards-container');
+
+        // Form Inputs
+        const occasion = document.getElementById('finder-occasion').value;
+        const budget = document.getElementById('finder-budget').value;
+        const relation = document.getElementById('finder-relation').value;
+
+        // Visual State Transitions
+        placeholderView.classList.add('hidden');
+        resultsView.classList.add('hidden');
+        loaderView.classList.remove('hidden');
+
+        // Simulate fast algorithm response match
+        setTimeout(() => {
+            loaderView.classList.add('hidden');
+            resultsView.classList.remove('hidden');
+
+            // Empty container
+            cardContainer.innerHTML = '';
+
+            // Retrieve matched database entry
+            const matches = giftFinderDB[occasion]?.[budget] || [];
+            
+            if(matches.length > 0) {
+                matches.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-5 rounded-2xl border border-stone-100 shadow-premium flex flex-col justify-between hover:shadow-glow-gold transition-all duration-300";
+                    card.innerHTML = `
+                        <div>
+                            <span class="text-3xl mb-3 block">${item.emoji}</span>
+                            <h4 class="font-display font-extrabold text-sm text-brand-dark leading-tight mb-1">${item.name}</h4>
+                            <p class="text-[10px] text-brand-primary font-black uppercase tracking-wider mb-3">${relation}</p>
+                        </div>
+                        <div class="space-y-3">
+                            <span class="font-display font-black text-base text-brand-dark block">$${item.price}</span>
+                            <button onclick="triggerQuickCart('${item.name.replace(/'/g, "\\'")}', ${item.price})" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white text-xs font-black py-2.5 rounded-xl transition duration-200">
+                                Gift Now
+                            </button>
+                        </div>
+                    `;
+                    cardContainer.appendChild(card);
+                });
+            } else {
+                cardContainer.innerHTML = `
+                    <div class="col-span-full text-center py-6">
+                        <p class="text-sm font-bold text-brand-gray">No direct matches. Select other parameters to search again!</p>
+                    </div>
+                `;
+            }
+
+            showCustomNotification("Gifts Matched!", "Optimized recommendations served.", "fa-gift");
+        }, 800);
+    }
+
+    // Handle create wishlist simulation
+    function handleCreateWishlistSubmit(event) {
+        event.preventDefault();
+        const username = document.getElementById('wishlist-username').value;
+        closeWishlistModal();
+        showCustomNotification("Registry Live!", `buyme.com/${username} is active!`, "fa-circle-check");
+    }
+
+    // Handle subscriber discount request
+    function handleClaimCoupon(event) {
+        event.preventDefault();
+        const emailInput = document.getElementById('subscriber-email');
+        showCustomNotification("Code Sent!", `Check inbox ${emailInput.value} for code.`, "fa-ticket");
+        emailInput.value = '';
+    }
+
+    // Quick conversion triggers simulated as toast items
+    function triggerQuickCart(itemName, price) {
+        showCustomNotification("Secured Gift Item!", `${itemName} ($${price}) allocated!`, "fa-cart-shopping");
+    }
+
+    // Custom Interactive Toast Notifications Generator (Non-Alert Requirement)
+    function showCustomNotification(title, message, iconClass = "fa-gift") {
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toast-title');
+        const toastMsg = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+
+        // Set visual copy
+        toastTitle.innerText = title;
+        toastMsg.innerText = message;
+        toastIcon.className = `fa-solid ${iconClass} text-brand-primary text-xl`;
+
+        // Slide animation state triggers
+        toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        // Dimiss automatically in 4s
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        }, 4000);
+    }
+</script>
+
+</body>
+</html>
